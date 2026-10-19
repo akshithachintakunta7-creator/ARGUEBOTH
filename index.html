@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ArgueBoth — Understand both sides. Decide for yourself.</title>
+  <meta name="description" content="ArgueBoth uses AI to lay out the strongest reasonable case for and against a debatable topic, find common ground, check evidence, and suggest a compromise." />
+  <meta name="theme-color" content="#070d18" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='18' fill='%234d8dff'/%3E%3Cpath d='M20 2a18 18 0 0 1 0 36z' fill='%23f5a623'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap site-header__inner">
+    <a class="brand" href="./">
+      <svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true" focusable="false">
+        <circle cx="20" cy="20" r="17" fill="#4d8dff" />
+        <path d="M20 3a17 17 0 0 1 0 34z" fill="#f5a623" />
+        <rect x="19" y="3" width="2" height="34" fill="#070d18" />
+      </svg>
+      <span class="brand__text">
+        <span class="brand__name">ArgueBoth</span>
+        <span class="brand__tag">Understand both sides. Decide for yourself.</span>
+      </span>
+    </a>
+    <span class="pill">Live AI · Groq</span>
+  </div>
+</header>
+
+<main id="main">
+
+  <section class="hero wrap" aria-labelledby="heroTitle">
+    <p class="eyebrow">Balanced debate helper</p>
+    <h1 id="heroTitle">See the strongest version of <span class="hl">both</span> sides.</h1>
+    <p class="hero__lede">
+      Ask a debatable question. ArgueBoth lays out the best reasonable case for and against it,
+      shows what each side quietly assumes, finds where they actually agree, and points to the
+      evidence that would settle the question.
+    </p>
+
+    <form class="topic-form" id="topicForm" novalidate>
+      <label class="sr-only" for="topicInput">Your debate topic</label>
+      <input
+        id="topicInput"
+        name="topic"
+        type="text"
+        placeholder="e.g. Should college attendance be optional?"
+        autocomplete="off"
+        spellcheck="false"
+        aria-describedby="topicError"
+        maxlength="200"
+      />
+      <button class="btn btn--primary" type="submit" id="submitBtn">Explore both sides</button>
+    </form>
+    <p class="form-error" id="topicError" role="alert" hidden></p>
+
+    <div class="examples" aria-label="Example topics">
+      <span class="examples__label">Try one:</span>
+      <button class="chip" type="button" data-topic="Should college attendance be optional?">College attendance</button>
+      <button class="chip" type="button" data-topic="Should students be allowed to use AI for homework?">AI for homework</button>
+      <button class="chip" type="button" data-topic="Should social media have a minimum age of 16?">Social media age limit</button>
+      <button class="chip" type="button" data-topic="Should companies adopt a four-day work week?">Four-day work week</button>
+      <button class="chip" type="button" data-topic="Should homework be abolished in primary school?">Homework in primary school</button>
+    </div>
+
+    <div class="steelman-toggle">
+      <label class="switch">
+        <input type="checkbox" id="steelmanToggle" />
+        <span class="switch__track"></span>
+      </label>
+      <span class="steelman-label">
+        <strong>Strengthen the other side</strong>
+        <span class="steelman-hint">Show the fairest, most persuasive version of each argument.</span>
+      </span>
+    </div>
+
+    <ol class="stepper" id="stepper" aria-label="How it works">
+      <li data-step="1"><span class="stepper__dot">1</span> Pick a topic</li>
+      <li data-step="2"><span class="stepper__dot">2</span> Compare both sides</li>
+      <li data-step="3"><span class="stepper__dot">3</span> Find common ground</li>
+    </ol>
+  </section>
+
+  <section class="results wrap" id="results" aria-live="polite" hidden></section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap site-footer__inner">
+    <div>
+      <p class="footer__title">ArgueBoth</p>
+      <p class="footer__text">
+        A student project built with plain HTML, CSS and JavaScript, powered by the Groq API.
+        No chat history is stored. Every response is generated for the current topic only.
+      </p>
+    </div>
+    <div>
+      <p class="footer__title">Responsible use</p>
+      <p class="footer__text">
+        AI responses can contain mistakes. Verifiable claims should be checked against primary sources.
+        A compromise is not always the right answer — use these perspectives as a starting point, not a verdict.
+      </p>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
