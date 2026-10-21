@@ -4,9 +4,15 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ArgueBoth — Understand both sides. Decide for yourself.</title>
-  <meta name="description" content="ArgueBoth uses AI to lay out the strongest reasonable case for and against a debatable topic, find common ground, check evidence, and suggest a compromise." />
+  <meta name="description" content="ArgueBoth uses AI to lay out the strongest reasonable case for and against a debatable topic." />
   <meta name="theme-color" content="#070d18" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='18' fill='%234d8dff'/%3E%3Cpath d='M20 2a18 18 0 0 1 0 36z' fill='%23f5a623'/%3E%3C/svg%3E" />
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -26,12 +32,14 @@
         <span class="brand__tag">Understand both sides. Decide for yourself.</span>
       </span>
     </a>
-    <span class="pill">Live AI · Groq</span>
+    <div class="header-actions">
+      <button class="btn btn--text" id="openModalBtn">How it works</button>
+      <span class="pill">Live AI · Groq</span>
+    </div>
   </div>
 </header>
 
 <main id="main">
-
   <section class="hero wrap" aria-labelledby="heroTitle">
     <p class="eyebrow">Balanced debate helper</p>
     <h1 id="heroTitle">See the strongest version of <span class="hl">both</span> sides.</h1>
@@ -85,27 +93,34 @@
   </section>
 
   <section class="results wrap" id="results" aria-live="polite" hidden></section>
-
 </main>
 
 <footer class="site-footer">
   <div class="wrap site-footer__inner">
     <div>
       <p class="footer__title">ArgueBoth</p>
-      <p class="footer__text">
-        A student project built with plain HTML, CSS and JavaScript, powered by the Groq API.
-        No chat history is stored. Every response is generated for the current topic only.
-      </p>
+      <p class="footer__text">A student project built with plain HTML, CSS and JavaScript, powered by the Groq API. No chat history is stored.</p>
     </div>
     <div>
       <p class="footer__title">Responsible use</p>
-      <p class="footer__text">
-        AI responses can contain mistakes. Verifiable claims should be checked against primary sources.
-        A compromise is not always the right answer — use these perspectives as a starting point, not a verdict.
-      </p>
+      <p class="footer__text">AI responses can contain mistakes. Verifiable claims should be checked against primary sources.</p>
     </div>
   </div>
 </footer>
+
+<!-- "How it works" Modal -->
+<dialog id="infoModal" class="modal">
+  <div class="modal__header">
+    <h2 class="modal__title">How ArgueBoth Works</h2>
+    <button id="closeModalBtn" class="modal__close" aria-label="Close modal">&times;</button>
+  </div>
+  <div class="modal__body">
+    <p>ArgueBoth uses the <strong>Groq API</strong> (running the Llama-3.3-70b model) to generate balanced arguments in real-time.</p>
+    <p><strong>Prompt Engineering:</strong> The secure backend forces the AI to return strict JSON, explicitly forbidding made-up statistics and ensuring a neutral tone.</p>
+    <p><strong>Steelman Mode:</strong> When toggled, the AI generates a secondary set of arguments designed to present the opposing view in its strongest, most charitable light.</p>
+    <p><strong>Privacy:</strong> No data is stored. Your topic is sent to the Worker, processed, and immediately discarded. The API key is safely hidden on the server.</p>
+  </div>
+</dialog>
 
 <script src="script.js"></script>
 </body>

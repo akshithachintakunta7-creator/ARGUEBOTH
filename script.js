@@ -1,27 +1,22 @@
-/* ============================================================
-   ArgueBoth — frontend logic
-   ============================================================ */
-
 const CONFIG = {
-  // Replace this with your deployed Cloudflare Worker URL.
-  // Example: "https://argueboth-proxy.your-subdomain.workers.dev/chat"
+  // Ensure this matches your deployed Cloudflare Worker URL exactly
   apiEndpoint: "https://argueboth-proxy.argueboth-aksh.workers.dev",
   maxTopicLength: 200,
   minTopicLength: 5,
 };
 
 /* ── DOM refs ─────────────────────────────────────────────── */
-
 const form = document.getElementById("topicForm");
 const input = document.getElementById("topicInput");
 const errorEl = document.getElementById("topicError");
-const submitBtn = document.getElementById("submitBtn");
 const results = document.getElementById("results");
 const steelmanToggle = document.getElementById("steelmanToggle");
 const stepper = document.getElementById("stepper");
+const modal = document.getElementById("infoModal");
+const openModalBtn = document.getElementById("openModalBtn");
+const closeModalBtn = document.getElementById("closeModalBtn");
 
 /* ── helpers ──────────────────────────────────────────────── */
-
 function setStep(active) {
   const items = stepper.querySelectorAll("li");
   items.forEach((li) => {
@@ -43,56 +38,31 @@ function clearError() {
 
 function escapeHtml(str) {
   return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
-
-/* ── validation ───────────────────────────────────────────── */
 
 function validateTopic(raw) {
   const topic = raw.trim();
   if (!topic) return "Please enter a topic.";
-  if (topic.length < CONFIG.minTopicLength)
-    return `Please enter at least ${CONFIG.minTopicLength} characters.`;
-  if (topic.length > CONFIG.maxTopicLength)
-    return `Please keep the topic under ${CONFIG.maxTopicLength} characters.`;
+  if (topic.length < CONFIG.minTopicLength) return `Please enter at least ${CONFIG.minTopicLength} characters.`;
+  if (topic.length > CONFIG.maxTopicLength) return `Please keep the topic under ${CONFIG.maxTopicLength} characters.`;
   return null;
 }
 
-/* ── loading state ────────────────────────────────────────── */
-
+/* ── rendering ────────────────────────────────────────────── */
 function renderLoading() {
   results.hidden = false;
-  results.innerHTML = `
-    <div class="loading" role="status">
-      <div class="spinner" aria-hidden="true"></div>
-      <p>Building both sides…</p>
-    </div>
-  `;
+  results.innerHTML = `<div class="loading" role="status"><div class="spinner" aria-hidden="true"></div><p>Building both sides…</p></div>`;
 }
 
 function renderError(message) {
   results.hidden = false;
-  results.innerHTML = `
-    <div class="result-error">
-      <strong>Something went wrong.</strong><br />
-      ${escapeHtml(message)}
-    </div>
-  `;
+  results.innerHTML = `<div class="result-error"><strong>Something went wrong.</strong><br />${escapeHtml(message)}</div>`;
 }
-
-/* ── result rendering ─────────────────────────────────────── */
 
 function section(title, body) {
   if (!body) return "";
-  return `
-    <div class="insight-card">
-      <h3 class="insight-card__title">${escapeHtml(title)}</h3>
-      <p class="insight-card__body">${escapeHtml(body)}</p>
-    </div>
-  `;
+  return `<div class="insight-card"><h3 class="insight-card__title">${escapeHtml(title)}</h3><p class="insight-card__body">${escapeHtml(body)}</p></div>`;
 }
 
 function debateCard(kind, title, data) {
@@ -100,30 +70,22 @@ function debateCard(kind, title, data) {
   const sideClass = kind === "for" ? "debate-card--for" : "debate-card--against";
   const icon = kind === "for" ? "✓" : "✕";
   const label = kind === "for" ? "In favour" : "Against";
-
   const parts = [];
+  
   if (data.claim) parts.push(`<p>${escapeHtml(data.claim)}</p>`);
-  if (data.assumption)
-    parts.push(`<p><span class="debate-card__label">Hidden assumption</span>${escapeHtml(data.assumption)}</p>`);
-  if (data.limitation)
-    parts.push(`<p><span class="debate-card__label">Limitation</span>${escapeHtml(data.limitation)}</p>`);
+  if (data.assumption) parts.push(`<p><span class="debate-card__label">Hidden assumption</span>${escapeHtml(data.assumption)}</p>`);
+  if (data.limitation) parts.push(`<p><span class="debate-card__label">Limitation</span>${escapeHtml(data.limitation)}</p>`);
 
   return `
     <article class="debate-card ${sideClass}">
-      <div class="debate-card__head">
-        <span class="debate-card__icon" aria-hidden="true">${icon}</span>
-        <h3 class="debate-card__title">${escapeHtml(label)}</h3>
-      </div>
-      <div class="debate-card__body">
-        ${parts.join("")}
-      </div>
+      <div class="debate-card__head"><span class="debate-card__icon" aria-hidden="true">${icon}</span><h3 class="debate-card__title">${escapeHtml(label)}</h3></div>
+      <div class="debate-card__body">${parts.join("")}</div>
     </article>
   `;
 }
 
 function renderResult(topic, data) {
   const steelmanOn = steelmanToggle.checked;
-
   const forData = steelmanOn && data.steelmanFor ? data.steelmanFor : data.for;
   const againstData = steelmanOn && data.steelmanAgainst ? data.steelmanAgainst : data.against;
 
@@ -132,33 +94,37 @@ function renderResult(topic, data) {
     <div class="results__header">
       <h2 class="results__topic">${escapeHtml(topic)}</h2>
       ${steelmanOn ? '<span class="results__badge">Steelman mode</span>' : ""}
+      <button class="btn" id="copyBtn" style="margin-left: auto; padding: 0.5rem 1rem; font-size: 0.85rem; background: var(--surface-2); color: var(--text);">Copy Debate</button>
     </div>
-
     <div class="debate-grid">
       ${debateCard("for", "In favour", forData)}
       ${debateCard("against", "Against", againstData)}
     </div>
-
     <div class="insight-grid">
       ${section("Common ground", data.commonGround)}
       ${section("Evidence check", data.evidence)}
       ${section("Possible compromise", data.compromise)}
     </div>
-
-    <p class="results__footer" style="margin-top:1.5rem;font-size:.8rem;color:var(--text-faint);">
-      Generated by AI. Verify important claims independently. No chat history is saved.
-    </p>
+    <p class="results__footer" style="margin-top:1.5rem;font-size:.8rem;color:var(--text-faint);">Generated by AI. Verify important claims independently. No chat history is saved.</p>
   `;
+
+  // Attach Copy Event Listener
+  document.getElementById("copyBtn").addEventListener("click", () => {
+    const textToCopy = `Topic: ${topic}\n\nIN FAVOUR:\n${forData.claim}\n\nAGAINST:\n${againstData.claim}\n\nCOMMON GROUND:\n${data.commonGround}\n\nEVIDENCE:\n${data.evidence}\n\nCOMPROMISE:\n${data.compromise}`;
+    navigator.clipboard.writeText(textToCopy).then(() => {
+      const btn = document.getElementById("copyBtn");
+      btn.textContent = "Copied!";
+      setTimeout(() => { btn.textContent = "Copy Debate"; }, 2000);
+    }).catch(err => console.error("Copy failed", err));
+  });
 
   setStep(3);
   results.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 /* ── main fetch ───────────────────────────────────────────── */
-
 async function fetchDebate(topic) {
   const steelman = steelmanToggle.checked;
-
   renderLoading();
   setStep(2);
 
@@ -171,28 +137,14 @@ async function fetchDebate(topic) {
 
     if (!response.ok) {
       let detail = "";
-      try {
-        const err = await response.json();
-        detail = err.error || JSON.stringify(err);
-      } catch {
-        detail = await response.text();
-      }
-
-      if (response.status === 429) {
-        throw new Error(
-          "The AI is receiving too many requests right now. Please wait a minute and try again."
-        );
-      }
-
+      try { const err = await response.json(); detail = err.error || JSON.stringify(err); } catch { detail = await response.text(); }
+      if (response.status === 429) throw new Error("The AI is receiving too many requests right now. Please wait a minute and try again.");
       throw new Error(detail || `Request failed with status ${response.status}.`);
     }
 
     const data = await response.json();
-
-    if (!data || typeof data !== "object" || (!data.for && !data.against)) {
-      throw new Error("The AI returned an unexpected response. Please try again.");
-    }
-
+    if (!data || typeof data !== "object" || (!data.for && !data.against)) throw new Error("The AI returned an unexpected response.");
+    
     renderResult(topic, data);
   } catch (err) {
     setStep(1);
@@ -201,18 +153,12 @@ async function fetchDebate(topic) {
 }
 
 /* ── events ───────────────────────────────────────────────── */
-
 form.addEventListener("submit", (e) => {
   e.preventDefault();
   clearError();
-
   const raw = input.value;
   const validationError = validateTopic(raw);
-  if (validationError) {
-    showError(validationError);
-    return;
-  }
-
+  if (validationError) return showError(validationError);
   fetchDebate(raw.trim());
 });
 
@@ -226,6 +172,23 @@ document.querySelectorAll(".chip").forEach((chip) => {
   });
 });
 
-/* ── init ─────────────────────────────────────────────────── */
+// 1. Auto-fetch on Steelman Toggle
+steelmanToggle.addEventListener("change", () => {
+  if (input.value.trim().length > 4 && !results.hidden) {
+    fetchDebate(input.value.trim());
+  }
+});
 
+// 5. Modal Open/Close Logic
+openModalBtn.addEventListener("click", () => modal.showModal());
+closeModalBtn.addEventListener("click", () => modal.close());
+modal.addEventListener("click", (e) => {
+  // Close if clicking on the backdrop (outside the modal content)
+  const rect = modal.getBoundingClientRect();
+  if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) {
+    modal.close();
+  }
+});
+
+/* ── init ─────────────────────────────────────────────────── */
 setStep(1);
